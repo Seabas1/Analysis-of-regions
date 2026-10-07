@@ -1,0 +1,19 @@
+# Пример (чужая работа) в репозиторий не входит
+_образец/
+
+# Крупные файлы, которые восстанавливаются скриптами заново
+data/rosstat/*.rar
+data/rosstat/*.pdf
+data/rosstat/Region_Pokaz_2025/
+data/rosstat/txt/
+data/osm/*.pbf
+data/osm/_cache_07deg/
+data/labor/vacancies_raw.json
+
+# Служебные файлы и артефакты проверок
+__pycache__/
+*.py[cod]
+_checks*.json
+preview*/
+*.log
+.tools/

@@ -1,0 +1,12 @@
+# Единые переводы строк: в репозитории LF, на диске — как принято в системе
+* text=auto eol=lf
+
+# Бинарные файлы: без нормализации
+*.pptx binary
+*.pdf binary
+*.png binary
+*.ico binary
+*.ttf binary
+*.csv text eol=lf
+*.geojson text eol=lf
+*.json text eol=lf

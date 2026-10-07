@@ -1,0 +1,4 @@
+numpy
+python-docx
+python-pptx
+osmium
