@@ -32,7 +32,9 @@ exp = Counter(r["experience"].strip() or "не указан" for r in rows)
 
 by_cat = defaultdict(list)
 for r in rows:
-    if r["salary_min"].strip() and r["category"].strip():
+    # медиана по сфере считается только по вакансиям с указанной зарплатой,
+    # а число вакансий в сфере берётся из полного счётчика cat
+    if r["category"].strip() and r["salary_min"].strip() and float(r["salary_min"]) > 0:
         by_cat[r["category"].strip()].append(float(r["salary_min"]))
 
 # статистика Росстата по занятости и оплате
@@ -60,8 +62,9 @@ for k, v in prof.most_common(10):
     print("   %-38s %4d" % (k[:38], v))
 
 print("\nсферы: число вакансий и медиана зарплаты (топ-10 по числу вакансий):")
-for c, vals in sorted(by_cat.items(), key=lambda kv: -len(kv[1]))[:10]:
-    print("   %-42s %4d вакансий  медиана %7.0f ₽" % (c[:42], len(vals), st.median(vals)))
+for c, cnt in cat.most_common(10):
+    vals = by_cat.get(c) or []
+    print("   %-42s %4d вакансий  медиана %7.0f ₽" % (c[:42], cnt, st.median(vals) if vals else 0))
 
 EXP_LABEL = {"0": "без опыта", "1": "от 1 года", "2": "от 2 лет", "3": "от 3 лет",
              "4": "от 4 лет", "5": "от 5 лет", "6": "от 6 лет"}
