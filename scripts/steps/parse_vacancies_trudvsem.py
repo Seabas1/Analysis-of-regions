@@ -7,7 +7,7 @@ import json, os, ssl, sys, time, urllib.parse, urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-PROJECT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # локальные зависимости (numpy, python-docx, python-pptx, osmium)
 TOOLS = os.environ.get("SARATOV_TOOLS") or os.path.join(os.path.dirname(PROJECT), ".tools")
 OUT = os.path.join(PROJECT, "data", "labor")

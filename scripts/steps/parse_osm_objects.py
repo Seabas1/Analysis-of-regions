@@ -5,7 +5,7 @@
 соседних регионов в выборку не попадают.
 """
 import csv, json, os, sys, time
-PROJECT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # локальные зависимости (numpy, python-docx, python-pptx, osmium)
 TOOLS = os.environ.get("SARATOV_TOOLS") or os.path.join(os.path.dirname(PROJECT), ".tools")
 sys.path.insert(0, TOOLS)
