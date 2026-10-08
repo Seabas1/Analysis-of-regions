@@ -93,7 +93,7 @@ def kpi_row(slide, items, top, height=1.25, size_val=22, size_lab=10.5, left=0.6
         card(slide, x, top, width, height)
         box(slide, value, x + 0.08, top + 0.13, width - 0.16, 0.5, size=size_val, bold=True,
             color=RED_DARK, align=PP_ALIGN.CENTER)
-        box(slide, label, x + 0.08, top + 0.68, width - 0.16, 0.5, size=size_lab,
+        box(slide, label, x + 0.05, top + 0.68, width - 0.10, 0.5, size=size_lab,
             color=GRAPHITE, align=PP_ALIGN.CENTER, line_spacing=0.95)
 
 
@@ -105,6 +105,10 @@ def bullets(slide, items, left=0.62, top=1.5, width=12.05, height=5.2, size=13.5
     for i, item in enumerate(items):
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
         p.space_after = Pt(gap)
+        # висячий отступ: продолжение пункта начинается под текстом, а не под маркером
+        pPr = p._p.get_or_add_pPr()
+        pPr.set("marL", str(int(Inches(0.24))))
+        pPr.set("indent", str(-int(Inches(0.24))))
         r = p.add_run()
         r.text = "•  " + item
         r.font.size = Pt(size)
@@ -123,11 +127,14 @@ def table(slide, rows, left, top, width, ratios, row_h=0.4):
         for c, text in enumerate(row):
             cell = tbl.cell(r, c)
             cell.text = text
-            run = cell.text_frame.paragraphs[0].runs[0]
-            run.font.size = Pt(TABLE_FONT)
-            run.font.bold = False          # в таблицах жирного нет: шапка выделяется цветом
-            run.font.color.rgb = WHITE if r == 0 else DARK
-            run.font.name = FONT
+            # оформляем ВСЕ абзацы и прогоны: в многострочной ячейке каждый \n — свой абзац,
+            # иначе продолжение строки наследует кегль темы и выглядит крупнее основного текста
+            for p in cell.text_frame.paragraphs:
+                for run in p.runs:
+                    run.font.size = Pt(TABLE_FONT)
+                    run.font.bold = False      # в таблицах жирного нет: шапка выделяется цветом
+                    run.font.color.rgb = WHITE if r == 0 else DARK
+                    run.font.name = FONT
             cell.fill.solid()
             cell.fill.fore_color.rgb = RED_DARK if r == 0 else (LIGHT if r % 2 else WHITE)
             cell.margin_left = cell.margin_right = Inches(0.07)
@@ -156,7 +163,7 @@ def chart(slide, kind, cats, series, left, top, width, height, colors=None, lege
     plot.has_data_labels = True
     dl = plot.data_labels
     dl.show_value = True
-    dl.number_format = '0.0"%"'
+    dl.number_format = '0,0"%"'
     dl.number_format_is_linked = False
     dl.font.size = Pt(label_size)
     dl.font.bold = True
@@ -189,7 +196,7 @@ box(s, "Факультет прикладной математики — про�
     size=12, color=WHITE, line_spacing=1.15)
 box(s, "Саратовская область:\nсбор данных, парсинг, анализ", 1.62, 4.35, 11.3, 1.3,
     size=30, bold=True, color=WHITE, line_spacing=1.1)
-box(s, "Росстат  ·  «Работа в России»  ·  OpenStreetMap", 1.62, 5.5, 11.3, 0.45,
+box(s, "Росстат  ·  «Работа в России»  ·  OpenStreetMap", 1.62, 5.75, 11.3, 0.45,
     size=15, color=WHITE)
 box(s, "Санкт-Петербург, 2026", 9.2, 6.9, 3.95, 0.4, size=12, color=WHITE, align=PP_ALIGN.RIGHT)
 notes(s, "Работа построена как пайплайн: сначала сбор данных, потом анализ по сферам. "
@@ -360,19 +367,19 @@ s = content("Общий анализ области", "overview.py: регион
 box(s, "Как скрипт берёт числа", 0.62, 1.45, 5.9, 0.35, size=12.5, bold=True, color=RED_DARK)
 code(s, 't = rv.load(PROJECT)                      # saratov_tables.json\n'
         'area = rv.require(t, "1.1", label="Площадь территории")\n'
-        'pop  = rv.require(t, "1.1", label="Численность населения")\n'
-        'grp  = rv.require(t, "1.1", label="Валовой региональный продукт")\n'
+        'pop  = rv.require(t, "1.1", label="Численность")\n'
+        'grp  = rv.require(t, "1.1", label="Валовой продукт")\n'
         'grp_pc = rv.require(t, "9.2", year=2023)\n'
-        'pop_2010 = rv.require(t, "2.1", year=2010)', 0.62, 1.9, 5.9, 2.4, size=11)
+        'pop_2010 = rv.require(t, "2.1", year=2010)', 0.62, 1.9, 5.9, 1.95, size=11)
 box(s, "Адресация: «номер таблицы + год + подпись столбца». Если столбец не найден, скрипт "
        "падает с ошибкой — пустое значение не подставляется.",
-    0.62, 4.45, 5.9, 0.9, size=11, color=DARK, line_spacing=1.3)
+    0.62, 4.3, 5.9, 0.9, size=11.5, color=DARK, line_spacing=1.3)
 kpi_row(s, [("101,2", "тыс. км²\nплощадь"), ("2 385,2", "тыс. человек\nнаселение"),
             ("1 147,9", "тыс. человек\nзанятых"), ("1 345", "млрд ₽\nВРП, 2023")],
-        top=1.55, left=6.85, right=12.67, height=1.15, size_val=18, size_lab=10.5)
+        top=1.55, left=6.85, right=12.67, height=1.15, size_val=18, size_lab=9)
 kpi_row(s, [("561 624", "₽ ВРП на душу"), ("58 626", "₽ зарплата"),
             ("316,7", "млрд ₽ инвестиции"), ("328", "муниципальных\nобразований")],
-        top=2.85, left=6.85, right=12.67, height=1.15, size_val=18, size_lab=10.5)
+        top=2.85, left=6.85, right=12.67, height=1.15, size_val=18, size_lab=9)
 bullets(s, [
     "Население сократилось на 5,3% с 2010 г. (2 519,3 → 2 385,2 тыс.), а ВРП вырос в 3,6 раза.",
     "Городское население — 77,0%; в области 37 районов и 4 городских округа.",
@@ -479,13 +486,13 @@ notes(s, "Трудовой блок. Берём нижнюю границу ви
 
 # ==================================================== 13. Труд: статистика
 s = content("Рынок труда: результаты", "Спрос по вакансиям и фактическая статистика")
-kpi_row(s, [("4 183", "вакансии\nв выборке"), ("38 000 ₽", "медиана\nпредлагаемой"),
+kpi_row(s, [("4 183", "вакансии\nв выборке"), ("38 000 ₽", "медиана\nзарплаты"),
             ("45 349 ₽", "средняя\nпредлагаемая"), ("58 626 ₽", "средняя\nфактическая")],
         top=1.5, height=1.2, size_val=21, size_lab=11)
-box(s, "Распределение предлагаемых зарплат:  13 000 ₽ минимум  ·  28 500 ₽ 1-й квартиль  ·  "
-       "38 000 ₽ медиана  ·  45 349 ₽ средняя  ·  50 000 ₽ 3-й квартиль  ·  275 000 ₽ максимум",
-    0.62, 2.8, 12.05, 0.6, size=11, color=DARK, line_spacing=1.25)
-box(s, "Сферы: число вакансий и медиана предлагаемой зарплаты", 0.62, 3.25, 12.05, 0.35, size=12,
+box(s, "Предлагаемые зарплаты, ₽:  минимум 13 000  ·  1-й квартиль 28 500  ·  медиана 38 000\n"
+       "средняя 45 349  ·  3-й квартиль 50 000  ·  максимум 275 000",
+    0.62, 2.8, 12.05, 0.55, size=11, color=DARK, line_spacing=1.25)
+box(s, "Сферы: число вакансий и медиана предлагаемой зарплаты", 0.62, 3.4, 12.05, 0.35, size=12,
     bold=True, color=RED_DARK)
 table(s, [
     ["Сфера", "Вакансий", "Медиана, ₽", "Сфера", "Вакансий", "Медиана, ₽"],
@@ -494,11 +501,11 @@ table(s, [
     ["Образование, наука", "439", "27 093", "Электроэнергетика", "182", "52 529"],
     ["Производство", "360", "45 200", "Рабочие специальности", "170", "45 000"],
     ["ЖКХ, эксплуатация", "235", "32 000", "Строительство", "115", "50 767"],
-], 0.62, 3.62, 12.05, [0.22, 0.11, 0.15, 0.22, 0.11, 0.15], row_h=0.34)
+], 0.62, 3.78, 12.05, [0.22, 0.11, 0.15, 0.22, 0.11, 0.15], row_h=0.34)
 bullets(s, [
     "88,5% вакансий — на опыт от нуля до одного года; топ профессий: продавец-кассир, пекарь, дворник.",
     "Топ-10 работодателей дают 22,2% вакансий, при этом 476 работодателей имеют одну вакансию.",
-], left=0.62, top=6.2, width=12.05, size=11.5, gap=5)
+], left=0.62, top=6.15, width=12.05, size=11.5, gap=5)
 source(s, "scripts/labor.py; API «Работа в России» (4 183 вакансии); Росстат, табл. 1.1, 4.6.")
 notes(s, "Главное наблюдение блока: самые востребованные сферы — образование и здравоохранение — "
          "оплачиваются хуже всех. Спрос в бюджетном секторе не подкреплён оплатой.")
