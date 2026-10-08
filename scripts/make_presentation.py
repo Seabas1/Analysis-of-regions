@@ -124,7 +124,7 @@ def table(slide, rows, left, top, width, ratios, row_h=0.4, size=10.5):
             cell.text = text
             run = cell.text_frame.paragraphs[0].runs[0]
             run.font.size = Pt(size)
-            run.font.bold = (r == 0)
+            run.font.bold = False          # в таблицах жирного нет: шапка выделяется цветом
             run.font.color.rgb = WHITE if r == 0 else DARK
             run.font.name = FONT
             cell.fill.solid()
